@@ -6,12 +6,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <link rel="icon" href="static/logo.png">
-  <link rel="stylesheet" href="app/style.css">
 </head>
 <body>
   <main id="screen">
     <div class="page"><div class="text centered">Loading…</div></div>
   </main>
-  <script type="module" src="app/main.js"></script>
+  <script>
+    // Load the app with a version stamp on every file (see tools/build-version.js), so an update
+    // is picked up as a whole. If version.json cannot be read, the app loads without the stamp.
+    (async () => {
+      let q = '';
+      try {
+        const v = await (await fetch('version.json', { cache: 'no-store' })).json();
+        q = `?v=${v.version}`;
+        const at = (p) => new URL(p, document.baseURI).href;
+        const map = document.createElement('script');
+        map.type = 'importmap';
+        map.textContent = JSON.stringify({ imports: Object.fromEntries(v.modules.map((p) => [at(p), at(p + q)])) });
+        document.head.append(map);
+      } catch (e) { console.warn('version.json not loaded', e); }
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = `app/style.css${q}`;
+      document.head.append(css);
+      const app = document.createElement('script');
+      app.type = 'module';
+      app.src = `app/main.js${q}`;
+      document.body.append(app);
+    })();
+  </script>
 </body>
 </html>

@@ -102,6 +102,19 @@ npm test
 ```
 
 runs the engine tests (content integrity, trial construction, scoring, order).
+`npm run test:server` runs the tests of the worker against an in-memory
+database (after `npm install` in `server/cloudflare`).
+
+After changing anything under `app/`, run
+
+```bash
+npm run stamp
+```
+
+which rewrites `version.json`. The page loads every script with that version
+in its address, so that after an update participants get the complete new set
+of files instead of a mixture of cached and new ones. `npm test` fails if
+`version.json` is out of date.
 
 ```bash
 npm run serve
