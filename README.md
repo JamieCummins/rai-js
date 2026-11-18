@@ -120,7 +120,9 @@ of files instead of a mixture of cached and new ones. `npm test` fails if
 npm run serve
 ```
 
-serves the site on http://localhost:8080. Useful links:
+serves the site on http://localhost:8080, and `npm run api` (in a second
+terminal) runs the server locally on http://localhost:8787 with a local
+database. Useful links:
 
 - `?backend=local` runs entirely in the browser with no server, for demos.
   Options can be switched on in the link, for example

@@ -9,7 +9,8 @@
     "serve": "python3 -m http.server 8080",
     "content:import": "node tools/build-content-from-labjs.js",
     "test:server": "cd server/cloudflare && npm test",
-    "stamp": "node tools/build-version.js"
+    "stamp": "node tools/build-version.js",
+    "api": "cd server/cloudflare && npx wrangler dev --local"
   },
   "license": "GPL-3.0"
 }
