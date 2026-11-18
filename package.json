@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "serve": "python3 -m http.server 8080",
-    "content:import": "node tools/build-content-from-labjs.js"
+    "content:import": "node tools/build-content-from-labjs.js",
+    "test:server": "cd server/cloudflare && npm test"
   },
   "license": "GPL-3.0"
 }
