@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `npx wrangler dev` (local only, never committed).
+AUTH_SECRET=dev-secret-change-me
+ADMIN_TOKEN=dev-admin
+# Return login codes in the API response instead of emailing them. Local development only.
+DEV_SHOW_CODES=1

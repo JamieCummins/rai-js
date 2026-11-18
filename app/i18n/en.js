@@ -1,0 +1,83 @@
+/** English interface text. Placeholders in {braces} are filled in by the app. */
+export default {
+  title: 'Relational Abilities Index',
+  ui: {
+    continue: 'Continue',
+    begin: 'Begin',
+    submit: 'Submit',
+    loading: 'Loading…',
+    retry: 'Try again',
+    download: 'Download my data (CSV)',
+  },
+
+  login: {
+    emailIntro: 'Welcome! Please enter your email address. We will send you a 6-digit code to log in.',
+    emailLabel: 'Email address',
+    sendCode: 'Send me a code',
+    codeIntro: 'We have sent a 6-digit code to <b>{email}</b>. It can take a minute to arrive; please also check your spam folder.',
+    codeLabel: 'Login code',
+    verify: 'Log in',
+    otherEmail: 'Use a different email address',
+    devCode: 'Test mode: your code is {code}',
+    smartIntro: 'Welcome! Please log in with your SMART username and PIN.',
+    usernameLabel: 'Username',
+    pinLabel: 'PIN',
+    logIn: 'Log in',
+    idIntro: 'Welcome! Please enter your {label} to begin.',
+    loggedInAs: 'You are logged in as <b>{identifier}</b>.',
+    notMe: 'This is not me',
+  },
+
+  errors: {
+    study: 'This link is not valid. Please check the link you were given, or contact the person who sent it to you.',
+    noStudy: 'This link is incomplete. Please use the full link you were given.',
+    email: 'Please enter a valid email address.',
+    code: 'That code is not correct or has expired. Please try again, or ask for a new code.',
+    invalid: 'That username and PIN do not match. Please try again.',
+    identifier: 'Please enter a valid ID (letters and numbers, no spaces).',
+    notInvited: 'This ID is not registered for this study. Please check it, or contact the person who invited you.',
+    tooMany: 'Too many codes have been requested for this address. Please wait a while and try again.',
+    emailUnavailable: 'Login by email is not available at the moment. Please contact the person who sent you this link.',
+    emailFailed: 'We could not send the email. Please check the address and try again.',
+    network: 'No connection to the server. Please check your internet connection and try again.',
+    unauthorized: 'Your login has expired. Please reload the page and log in again.',
+    server: 'Something went wrong. Please try again.',
+    load: 'The test could not be loaded. Please reload the page.',
+    demographics: 'Please answer both questions (age as a whole number).',
+  },
+
+  demographics: {
+    intro: 'Before we begin, please tell us a little about yourself.',
+    age: 'How old are you?',
+    gender: 'What is your gender?',
+  },
+
+  instructions: [
+    'You will now complete a test. On every trial, you will see 2-to-4 sentences about the relationship between made-up words. For example: "CUG is the same as JOM, JOM is the same as VEK". You will also see a number of buttons (between 2 and 4) with extra statements on them. For example:<br><br>A: CUG is the same as VEK<br>B: CUG is opposite to VEK<br>C: CUG is opposite to JOM<br>D: JOM is opposite to VEK<br><br>You will be asked to select (by clicking) some of those buttons based on the information you were provided (e.g., select all buttons whose statements are true).<br><br>Click <kbd>continue</kbd> to go to the next instruction.',
+    'For each statement on the buttons, there are two possibilities: the information is <i>true</i>, or the information is <i>false</i>.<br><br>For example, if you were told "CUG is the same as JOM" and "JOM is the same as VEK":<br>the statement "CUG is the same as VEK" would be <b>true</b>;<br>the statement "CUG is opposite to VEK" would be <b>false</b>.<br><br>Click <kbd>continue</kbd> to go to the next instruction.',
+  ],
+  instructionsLast: 'Sometimes there is only one correct answer. Other times, there can be multiple statements that are correct.<br>You should click on each option you think is correct. When you are happy with your selection, you can click the "submit" button to move to the next trial. Each trial has a time limit of {limit}, so try to be quick!',
+  practiceIntro: "We'll start with a couple of practice questions. When you are ready, click <kbd>begin</kbd> to start the practice trials.",
+  beginPracticeDone: "Well done! We'll now start with the real task. There will be {total} total trials that you need to complete{breaks}.<br><br>When you are ready, click <kbd>begin</kbd> to start the task. Good luck!",
+  beginNoPractice: 'There will be {total} total trials that you need to complete{breaks}.<br><br>When you are ready, click <kbd>begin</kbd> to start the task. Good luck!',
+  breaksEvery: ', and you will have a break every {every} trials or so',
+  limitMinute: '1 minute',
+  limitSeconds: '{seconds} seconds',
+
+  trial: {
+    question: 'Based on this information, select all statements which are <strong>{probe}</strong>.',
+    practiceProgress: 'Practice trial {n} of {total}',
+    progress: 'Trial {n} of {total}',
+  },
+
+  breakScreen: 'Well done! Feel free to take a short break.<br><br>When you are ready to continue, click <kbd>continue</kbd> to go back to the task.',
+  welcomeBack: 'Welcome back! You can continue the test from where you left off.<br><br>When you are ready, click <kbd>continue</kbd>.',
+  saving: 'Saving your answers…',
+  savingFailed: 'Your answers could not be saved yet. Please check your internet connection, keep this page open and try again.',
+  completion: 'You have completed the test. Well done!',
+  alreadyCompleted: 'You have already completed this test. Thank you!',
+  score: 'You answered {correct} of {total} trials correctly.',
+  completionCode: 'Your completion code is <b>{code}</b>.',
+  completionLink: 'Click here to finish',
+  closePage: 'You may now close the page!',
+};

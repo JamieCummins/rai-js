@@ -1,0 +1,7 @@
+check_id,after_trial,statement_1,statement_2,statement_3,statement_4,statement_5,true_statements,false_statements,probed_truth_value,n_answers,n_true_answers,n_false_answers
+AC1,20,THIS is an attention CHECK,THIS is an attention CHECK,,,,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,2,1,1
+AC2,46,THIS is an attention CHECK,THIS is an attention CHECK,THIS is an attention CHECK,THIS is an attention CHECK,,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,4,2,2
+AC3,66,THIS is an attention CHECK,THIS is an attention CHECK,,,,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,2,1,1
+AC4,77,THIS is an attention CHECK,THIS is an attention CHECK,THIS is an attention CHECK,THIS is an attention CHECK,,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,4,1,3
+AC5,82,THIS is an attention CHECK,THIS is an attention CHECK,,,,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,2,1,1
+AC6,108,THIS is an attention CHECK,THIS is an attention CHECK,If this was an attention check (it is),,then...,"CLICK this BUTTON, CLICK this BUTTON","DO NOT click this BUTTON, DO NOT click this BUTTON",TRUE,3,2,1

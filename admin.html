@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>RAI admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <style>
+    html { color-scheme: light; }
+    body { font-family: Verdana, Arial, sans-serif; margin: 2rem auto; max-width: 1100px; padding: 0 1rem; color: #222; background: #fff; }
+    h1 { color: #00ADEF; }
+    fieldset { border: 1px solid #ccc; border-radius: 8px; margin-bottom: 1.5rem; }
+    label { display: block; margin: 0.5rem 0; }
+    label.check { display: inline-block; margin-right: 1.2rem; }
+    input[type=text], input[type=password], input:not([type]), textarea, select { width: 100%; max-width: 600px; padding: 0.4rem; font-family: inherit; }
+    button { background: #00ADEF; color: #fff; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; margin: 0.25rem 0.25rem 0.25rem 0; }
+    button:hover { background: #F68712; }
+    button.small { padding: 0.2rem 0.6rem; font-size: 0.85rem; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { border: 1px solid #ddd; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+    td code { word-break: break-all; }
+    #status { color: #c62828; white-space: pre-wrap; }
+    small { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>RAI admin</h1>
+  <p>Studies, participants and data export for the RAI API. Nothing here is stored except the API URL, in this browser.</p>
+
+  <fieldset>
+    <legend>Connection</legend>
+    <label>API URL <input id="api" placeholder="https://rai-api.your-name.workers.dev"></label>
+    <label>Admin token <input id="token" type="password" autocomplete="off"></label>
+    <button id="connect">Connect</button>
+    <div id="status"></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Studies</legend>
+    <div id="studies">Not connected.</div>
+    <p><small>Each study has its own link. Add <code>&amp;t=pre</code>, <code>&amp;t=post</code> and so on to separate timepoints; without it the timepoint is <code>1</code>.</small></p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Create or edit a study</legend>
+    <label>Code (used in the link; a-z, 0-9, - and _) <input id="st-code" placeholder="acme2026"></label>
+    <label>Name (shown in the login email) <input id="st-label" placeholder="ACME assessment 2026"></label>
+    <label>Login
+      <select id="st-login">
+        <option value="email">Email address + one-time code sent by email</option>
+        <option value="smart">SMART username + PIN</option>
+        <option value="id">Participant ID (typed, or passed in the link as ?pid=)</option>
+      </select>
+    </label>
+    <label>Who may take part
+      <select id="st-registration">
+        <option value="open">Anyone with the link</option>
+        <option value="invited">Only the participants added below (not used for SMART logins)</option>
+      </select>
+    </label>
+    <label>Label of the ID field (login "Participant ID") <input id="st-idLabel" placeholder="Participant ID"></label>
+    <label>SMART database binding (login "SMART") <input id="st-accountDb" placeholder="DB"></label>
+    <label>Only SMART accounts with these study tags (login "SMART"; comma-separated, empty for all) <input id="st-smartStudy" placeholder="draak2026"></label>
+    <p>
+      <label class="check"><input type="checkbox" id="st-practice" checked> Practice trials</label>
+      <label class="check"><input type="checkbox" id="st-attentionChecks"> Attention checks</label>
+      <label class="check"><input type="checkbox" id="st-demographics"> Demographics (age, gender)</label>
+      <label class="check"><input type="checkbox" id="st-showScore"> Show score at the end</label>
+      <label class="check"><input type="checkbox" id="st-repeatable"> May be repeated at the same timepoint</label>
+      <label class="check"><input type="checkbox" id="st-fullscreen" checked> Fullscreen</label>
+      <label class="check"><input type="checkbox" id="st-active" checked> Active</label>
+    </p>
+    <label>Completion code (shown at the end; empty for none) <input id="st-completionCode"></label>
+    <label>Completion link (offered at the end; empty for none) <input id="st-completionUrl" placeholder="https://app.prolific.com/submissions/complete?cc=..."></label>
+    <button id="st-save">Save study</button>
+    <button id="st-clear">Clear form</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>Participants</legend>
+    <label>Study code (empty for all) <input id="p-study"></label>
+    <button id="p-load">Load participants</button>
+    <div id="participants"></div>
+    <label>Add participants to the study above, one email address or ID per line
+      <textarea id="p-new" rows="5" placeholder="anna@example.org&#10;ben@example.org"></textarea>
+    </label>
+    <button id="p-add">Add participants</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>Export</legend>
+    <label>Study code (empty for all) <input id="ex-study"></label>
+    <label>Only this participant (email, username or ID; optional) <input id="ex-identifier"></label>
+    <label>Since (ISO date, optional) <input id="ex-since" placeholder="2026-11-01"></label>
+    <button data-export="trials">Download trials</button>
+    <button data-export="administrations">Download administrations</button>
+    <button data-export="participants">Download participants</button>
+    <p><small>One row per trial, sitting or participant. In the trials file, <code>phase</code> separates practice, test and attention-check trials, and <code>debug</code> marks test runs opened with <code>?debug</code>.</small></p>
+  </fieldset>
+
+  <script type="module" src="app/admin.js"></script>
+</body>
+</html>
