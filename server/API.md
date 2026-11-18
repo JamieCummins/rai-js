@@ -9,7 +9,7 @@ All requests and responses are JSON. Authenticated endpoints expect
 `Authorization: Bearer <token>`, where the token was returned by one of the
 `/auth` endpoints. Errors are `{ "error": "<code>", "message": "..." }` with an
 HTTP error status; the app shows a message for these codes: `study`, `email`,
-`code`, `invalid`, `identifier`, `notInvited`, `tooMany`, `emailUnavailable`,
+`code`, `invalid`, `identifier`, `notInvited`, `tooMany`, `busy`, `emailUnavailable`,
 `emailFailed`, `unauthorized`, `network`.
 
 ## Studies

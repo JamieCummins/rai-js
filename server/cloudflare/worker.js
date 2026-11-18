@@ -11,6 +11,7 @@
  *   RESEND_API_KEY   secret for sending login codes by email    (wrangler secret put RESEND_API_KEY)
  *   MAIL_FROM        sender of those emails, e.g. "RAI <login@your-domain.org>"
  *   ALLOWED_ORIGINS  comma-separated list of allowed origins, or "*"
+ *   EMAIL_CODES_PER_HOUR  most login codes sent per hour over all studies and addresses (default 100)
  *   DEV_SHOW_CODES   "1" returns the login code in the API response instead of emailing it.
  *                    For local development only (.dev.vars); never set it on the deployed worker.
  */
@@ -18,7 +19,9 @@
 const TOKEN_TTL_SEC = 24 * 3600;
 const MAX_TRIALS_PER_REQUEST = 200;
 const CODE_TTL_MIN = 15;
-const MAX_CODES_PER_HOUR = 5;
+const MAX_CODES_PER_HOUR = 5;           // per study and address
+const DEFAULT_CODES_PER_HOUR_TOTAL = 100; // over all studies and addresses (EMAIL_CODES_PER_HOUR)
+const MIN_SECRET_LENGTH = 16;
 const MAX_CODE_ATTEMPTS = 5;
 const MAX_FAILED_LOGINS = 10;
 const LOCK_MINUTES = 15;
@@ -64,15 +67,23 @@ async function hmac(secret, data) {
   return b64url(await crypto.subtle.sign('HMAC', key, enc.encode(data)));
 }
 
+/** The signing secret. Without a proper one nothing that depends on it works (tokens could be forged). */
+function authSecret(env) {
+  if (typeof env.AUTH_SECRET !== 'string' || env.AUTH_SECRET.length < MIN_SECRET_LENGTH) {
+    throw new HttpError(500, 'server', `AUTH_SECRET is not set (at least ${MIN_SECRET_LENGTH} characters)`);
+  }
+  return env.AUTH_SECRET;
+}
+
 async function makeToken(env, participantId) {
   const payload = b64url(enc.encode(JSON.stringify({ pid: participantId, exp: Math.floor(Date.now() / 1000) + TOKEN_TTL_SEC })));
-  return `${payload}.${await hmac(env.AUTH_SECRET, payload)}`;
+  return `${payload}.${await hmac(authSecret(env), payload)}`;
 }
 
 async function verifyToken(env, token) {
   if (!token || !token.includes('.')) return null;
   const [payload, sig] = token.split('.');
-  if ((await hmac(env.AUTH_SECRET, payload)) !== sig) return null;
+  if ((await hmac(authSecret(env), payload)) !== sig) return null;
   try {
     const data = JSON.parse(new TextDecoder().decode(fromB64url(payload)));
     if (!data.pid || data.exp < Date.now() / 1000) return null;
@@ -196,7 +207,7 @@ async function sendLoginEmail(env, email, code, study) {
   }
 }
 
-const codeHash = (env, study, email, code) => hmac(env.AUTH_SECRET, `code:${study}:${email}:${code}`);
+const codeHash = (env, study, email, code) => hmac(authSecret(env), `code:${study}:${email}:${code}`);
 
 async function requestEmailCode(env, body) {
   const study = await loadStudy(env, body.study);
@@ -211,6 +222,14 @@ async function requestEmailCode(env, body) {
   const since = new Date(Date.now() - 3600000).toISOString();
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM rai_email_codes WHERE study = ? AND email = ? AND created_at > ?').bind(study.code, email, since).first();
   if (recent.n >= MAX_CODES_PER_HOUR) throw new HttpError(429, 'tooMany');
+  // An overall limit, so the worker cannot be used to send mail in bulk. Codes are deleted when
+  // they are used, so people who log in successfully do not count towards it.
+  const cap = num(env.EMAIL_CODES_PER_HOUR) ?? DEFAULT_CODES_PER_HOUR_TOTAL;
+  const total = await env.DB.prepare('SELECT COUNT(*) AS n FROM rai_email_codes WHERE created_at > ?').bind(since).first();
+  if (total.n >= cap) {
+    console.error(`Login codes: overall limit of ${cap} per hour reached`);
+    throw new HttpError(429, 'busy');
+  }
 
   const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
   await env.DB.batch([
@@ -230,10 +249,10 @@ async function verifyEmailCode(env, body) {
   const code = String(body.code || '').replace(/\D/g, '');
   const row = await env.DB.prepare('SELECT * FROM rai_email_codes WHERE study = ? AND email = ? AND expires_at > ? ORDER BY id DESC LIMIT 1').bind(study.code, email, now()).first();
   if (!row || row.attempts >= MAX_CODE_ATTEMPTS) throw new HttpError(401, 'code');
-  if ((await codeHash(env, study.code, email, code)) !== row.code_hash) {
-    await env.DB.prepare('UPDATE rai_email_codes SET attempts = attempts + 1 WHERE id = ?').bind(row.id).run();
-    throw new HttpError(401, 'code');
-  }
+  // Count the attempt before checking it, in one statement, so parallel requests cannot get extra guesses.
+  const counted = await env.DB.prepare('UPDATE rai_email_codes SET attempts = attempts + 1 WHERE id = ? AND attempts < ?').bind(row.id, MAX_CODE_ATTEMPTS).run();
+  if (!counted.meta.changes) throw new HttpError(401, 'code');
+  if ((await codeHash(env, study.code, email, code)) !== row.code_hash) throw new HttpError(401, 'code');
   await env.DB.prepare('DELETE FROM rai_email_codes WHERE study = ? AND email = ?').bind(study.code, email).run();
   return signIn(env, study, email, 'email');
 }
@@ -427,6 +446,7 @@ async function adminDeleteParticipant(env, url) {
     env.DB.prepare('DELETE FROM rai_trials WHERE participant_id = ?').bind(id),
     env.DB.prepare('DELETE FROM rai_administrations WHERE participant_id = ?').bind(id),
     env.DB.prepare('DELETE FROM rai_email_codes WHERE study = ? AND email = ?').bind(p.study, p.identifier),
+    env.DB.prepare('DELETE FROM rai_login_attempts WHERE key = ?').bind(`${p.source}:${p.identifier}`),
     env.DB.prepare('DELETE FROM rai_participants WHERE id = ?').bind(id),
   ]);
   return json({ deleted: p.identifier, trials: results[0].meta.changes, administrations: results[1].meta.changes });

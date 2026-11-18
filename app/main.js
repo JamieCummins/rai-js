@@ -41,7 +41,7 @@ async function emailLogin(backend, strings) {
     });
     const result = await screens.form({
       strings,
-      intro: `<p>${fill(strings.login.codeIntro, { email })}</p>`,
+      intro: `<p>${fill(strings.login.codeIntro, { email: escapeHtml(email) })}</p>`,
       fields: [{ name: 'code', label: strings.login.codeLabel, attrs: 'autocomplete="one-time-code" inputmode="numeric" maxlength="8"' }],
       note: devCode ? fill(strings.login.devCode, { code: devCode }) : '',
       submit: strings.login.verify,
@@ -167,7 +167,11 @@ async function run() {
   screens.loading(strings);
 
   // Upload anything left over from an interrupted sitting before asking where to continue.
-  const queue = createTrialQueue(backend, { owner: `${study.code}:${participant.identifier}`, batchSize: config.data.batchSize, flushIntervalMs: config.data.flushIntervalMs });
+  let loginExpired = false;
+  const queue = createTrialQueue(backend, {
+    owner: `${study.code}:${participant.identifier}`, batchSize: config.data.batchSize, flushIntervalMs: config.data.flushIntervalMs,
+    onStatus: (s) => { if (s.error?.code === 'unauthorized') loginExpired = true; },
+  });
   await queue.flush();
 
   const planned = { practice: settings.practice, attentionChecks: settings.attentionChecks, maxTrials: config.maxTrials || 0, fromTrial: DEBUG ? Number(params.get('from')) || 0 : 0, breakAfterTrials: config.breakAfterTrials };
@@ -263,7 +267,17 @@ async function run() {
   while (!info) {
     await queue.flush();
     if (!queue.pending) {
-      try { info = await backend.updateAdministration(admin.id, { status: 'completed', endedAt: new Date().toISOString() }); } catch (e) { console.warn('completing the administration failed', e); }
+      try { info = await backend.updateAdministration(admin.id, { status: 'completed', endedAt: new Date().toISOString() }); } catch (e) {
+        console.warn('completing the administration failed', e);
+        if (e.code === 'unauthorized') loginExpired = true;
+      }
+    }
+    if (!info && loginExpired) {
+      // Nothing can be saved with an expired login. The answers stay in this browser and are
+      // uploaded after logging in again, which then completes the administration.
+      await screens.message({ html: `<p>${strings.loginExpired}</p>`, button: strings.ui.reload });
+      location.reload();
+      return;
     }
     if (!info) {
       await screens.message({ html: `<p>${strings.savingFailed}</p>`, button: strings.ui.retry });

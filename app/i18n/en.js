@@ -7,6 +7,7 @@ export default {
     submit: 'Submit',
     loading: 'Loading…',
     retry: 'Try again',
+    reload: 'Reload',
     download: 'Download my data (CSV)',
   },
 
@@ -37,6 +38,7 @@ export default {
     identifier: 'Please enter a valid ID (letters and numbers, no spaces).',
     notInvited: 'This ID is not registered for this study. Please check it, or contact the person who invited you.',
     tooMany: 'Too many codes have been requested for this address. Please wait a while and try again.',
+    busy: 'Too many people are logging in at the moment. Please wait a few minutes and try again.',
     emailUnavailable: 'Login by email is not available at the moment. Please contact the person who sent you this link.',
     emailFailed: 'We could not send the email. Please check the address and try again.',
     network: 'No connection to the server. Please check your internet connection and try again.',
@@ -73,6 +75,7 @@ export default {
   breakScreen: 'Well done! Feel free to take a short break.<br><br>When you are ready to continue, click <kbd>continue</kbd> to go back to the task.',
   welcomeBack: 'Welcome back! You can continue the test from where you left off.<br><br>When you are ready, click <kbd>continue</kbd>.',
   saving: 'Saving your answers…',
+  loginExpired: 'Your login has expired. Your answers are kept on this device. Please click <kbd>reload</kbd> and log in again to finish.',
   savingFailed: 'Your answers could not be saved yet. Please check your internet connection, keep this page open and try again.',
   completion: 'You have completed the test. Well done!',
   alreadyCompleted: 'You have already completed this test. Thank you!',

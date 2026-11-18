@@ -26,8 +26,9 @@ safe to run on the live database and safe to run again later:
 npx wrangler d1 execute smart --remote --file=schema.sql
 ```
 
-Set the secrets. `AUTH_SECRET` is any long random string of your own (it does
-not need to match the SMART worker's); `ADMIN_TOKEN` is the password for
+Set the secrets. `AUTH_SECRET` is any long random string of your own (at least
+16 characters; it does not need to match the SMART worker's, and without it
+the worker refuses every login); `ADMIN_TOKEN` is the password for
 `admin.html`:
 
 ```bash
@@ -61,6 +62,10 @@ tier that is ample for this:
 ```bash
 npx wrangler secret put RESEND_API_KEY
 ```
+
+Login codes are limited to 5 per hour for one address and to
+`EMAIL_CODES_PER_HOUR` (in `wrangler.toml`, default 100) per hour over all
+studies and addresses; codes that have been used do not count towards either.
 
 Until this is done, studies with login `email` answer "Login by email is not
 available". Studies with login `id` or `smart` do not need it. To use another
